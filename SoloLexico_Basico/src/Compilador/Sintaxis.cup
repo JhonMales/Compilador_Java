@@ -1,0 +1,145 @@
+package Compilador;
+
+import java_cup.runtime.Symbol;
+
+parser code
+{:
+    private Symbol s;
+    
+    public void syntax_error(Symbol s){
+        this.s = s;
+    }
+
+    public Symbol getS(){
+        return this.s;
+}
+:};
+
+terminal Linea, Comillas, T_dato, Cadena, If, Else, Do, While, For, Int, Char,
+    Igual, Suma, Resta, Multiplicacion, Division, Op_logico, Op_relacional,
+    Op_atribucion, Op_incremento, Op_booleano, Parent_a, Parent_c, Printf,
+    Llave_a, Llave_c, Corchete_a, Corchete_c, Main, P_coma, Punto, Identificador,
+    Numero, Namespace, Unsigned, Void, Switch, Break, Cin, Static, Scanf, Short,
+    Const, Directiva, Continue, Enum, Default, Union, Std, Volatile, Goto, Return, 
+    Op_alcance, Extern, Include, Signed, Cout, Struct, Define, Typedef, Case, 
+    Register, Sizeof, Using, ERROR, Coma, Ampersand, Dos_puntos, Declara;
+
+non terminal INICIO, SENTENCIA, DECLARACION, IF, IF_ELSE, SENTENCIA_BOOLEANA,
+    DO_WHILE, WHILE, FOR, SENTENCIA_FOR, DECLARACION_FOR, PRINTF, SCANF, SWITCH, CASELINE, CASE,
+    INPUTS, INPUT, DEFAULT, UNSIGNED, STRUCT, USING, OUTPUT, OUTPUTS, DECLARA_FORMATO, DECLARA_FORMATOS,
+    RETURN;
+
+start with INICIO;
+
+INICIO ::= Int Main Parent_a Parent_c Llave_a SENTENCIA Llave_c |
+           Main Parent_a Parent_c Llave_a SENTENCIA Llave_c
+           Void Main Parent_a Parent_c Llave_a Llave_c |
+           Main Parent_a Parent_c Llave_a Llave_c |
+           Void Main Parent_a Parent_c Llave_a SENTENCIA Llave_c |
+           Int Main Parent_a Parent_c Llave_a Llave_c |
+;
+SENTENCIA ::= 
+    SENTENCIA DECLARACION |
+    DECLARACION |
+    SENTENCIA IF | 
+    IF |
+    SENTENCIA IF_ELSE |
+    IF_ELSE |
+    SENTENCIA WHILE |
+    WHILE |
+    SENTENCIA DO_WHILE |
+    DO_WHILE |
+    SENTENCIA FOR |
+    FOR |
+    PRINTF |
+    SENTENCIA SCANF |
+    SCANF |
+    SENTENCIA SWITCH |
+    SWITCH |
+    RETURN |
+    SENTENCIA RETURN |
+
+
+;
+DECLARACION ::=
+    Int Identificador P_coma |
+    T_dato Identificador P_coma | 
+    T_dato Identificador Op_atribucion Numero P_coma |
+    Int Identificador Igual Numero P_coma |
+    T_dato Identificador Op_atribucion Numero Punto Numero P_coma |
+    T_dato Identificador Igual Numero P_coma |
+    T_dato Identificador Igual Numero Punto Numero P_coma |
+    T_dato Identificador Op_incremento P_coma | 
+    T_dato Op_incremento Identificador P_coma | 
+    Cadena Identificador Op_atribucion Comillas Comillas P_coma |
+    Cadena Identificador Igual Comillas Comillas P_coma |
+    Cadena Identificador Op_atribucion Comillas Identificador Comillas P_coma |
+    Cadena Identificador Igual Comillas Identificador Comillas P_coma
+;
+INPUTS::= INPUT | INPUT INPUTS
+;
+INPUT::= Ampersand Identificador | Ampersand Identificador Coma
+;
+OUTPUTS::= OUTPUT | OUTPUT INPUTS
+;
+OUTPUT::= Identificador | Identificador Coma
+;
+SENTENCIA_BOOLEANA ::= 
+    Op_booleano | 
+    Identificador Op_relacional Op_booleano |
+    Identificador Op_relacional Numero |
+    Identificador Op_relacional Identificador |
+    Identificador Op_relacional Comillas Comillas |
+    Identificador Op_relacional Comillas Identificador Comillas
+;
+IF ::= If Parent_a SENTENCIA_BOOLEANA Parent_c Llave_a SENTENCIA Llave_c
+;
+IF_ELSE ::= If Parent_a SENTENCIA_BOOLEANA Parent_c Llave_a SENTENCIA Llave_c Else Llave_a SENTENCIA Llave_c
+;
+FOR ::= For Parent_a SENTENCIA_FOR Parent_c Llave_a SENTENCIA Llave_c
+;
+SENTENCIA_FOR ::=
+    T_dato Identificador Igual Numero P_coma SENTENCIA_BOOLEANA P_coma DECLARACION_FOR |
+    Identificador Igual Numero P_coma SENTENCIA_BOOLEANA P_coma DECLARACION_FOR
+;
+DECLARACION_FOR ::= 
+    Identificador Op_atribucion Numero |
+    Identificador Op_incremento | 
+    Op_incremento Identificador
+;
+WHILE ::= While Parent_a SENTENCIA_BOOLEANA Parent_c Llave_a SENTENCIA Llave_c
+;
+DO_WHILE ::= Do Llave_a SENTENCIA Llave_c While Parent_a SENTENCIA_BOOLEANA Parent_c P_coma
+;
+DECLARA_FORMATOS ::= DECLARA_FORMATO | DECLARA_FORMATO DECLARA_FORMATOS
+;
+DECLARA_FORMATO ::= Declara Identificador
+;
+PRINTF ::= Printf Parent_a Comillas Identificador Comillas Parent_c P_coma |
+           Printf Parent_a Comillas Identificador DECLARA_FORMATO Comillas Coma OUTPUTS Parent_c P_coma
+;
+SCANF ::= Scanf Parent_a Comillas DECLARA_FORMATOS Comillas Coma INPUTS Parent_c P_coma
+;
+SWITCH ::= Switch Parent_a Identificador Parent_c Llave_a CASE Llave_c |
+           Switch Parent_a Identificador Parent_c Llave_a CASE Default  Llave_c
+;
+CASE ::= CASELINE | CASELINE CASE ;
+CASELINE ::= Case Numero Dos_puntos SENTENCIA Break P_coma |
+             Case Numero Dos_puntos Break P_coma
+;
+USING ::= Using Namespace Std P_coma
+;
+STRUCT ::= Struct Identificador Llave_a SENTENCIA Llave_c
+;
+UNSIGNED ::= Unsigned Int Identificador P_coma |
+             Unsigned Short Int Identificador P_coma |
+             Unsigned Char Identificador P_coma |
+             Unsigned Identificador P_coma |
+             Unsigned Short Identificador P_coma;
+
+DEFAULT ::= Default Dos_puntos SENTENCIA;
+
+RETURN ::= Return Numero P_coma|
+           Return Identificador P_coma
+;
+

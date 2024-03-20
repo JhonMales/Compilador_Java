@@ -1,0 +1,2 @@
+start Programa.exe
+exit
